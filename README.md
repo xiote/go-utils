@@ -1,6 +1,6 @@
 ```
 src/
-    github.com/xiote/utils/str
-        str.go
-        str_test.go
+    github.com/xiote/strutil/
+        isempty.go
+        isempty_test.go
 ```
