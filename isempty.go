@@ -6,7 +6,11 @@ import (
 )
 
 func IsEmpty(s string) bool {
-	return (len(s) == 0)
+	if s == "" {
+		return true
+	} else {
+		return false
+	}
 }
 
 func IsSpaceOrEmpty(s string) bool {
