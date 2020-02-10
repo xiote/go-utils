@@ -9,5 +9,9 @@ func IsEmpty(s string) bool {
 }
 
 func IsSpaceOrEmpty(s string) bool {
+	return IsEmptyS(s)
+}
+
+func IsEmptyS(s string) bool {
 	return (len(strings.TrimSpace(s)) == 0)
 }

@@ -37,3 +37,21 @@ func TestIsSpaceOrEmpty(t *testing.T) {
 		}
 	}
 }
+
+func TestIsEmptyS(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{"NotSpaceOrEmptyString", false},
+		{" NotSpaceOrEmptyString ", false},
+		{"", true},
+		{"  ", true},
+	}
+	for _, c := range cases {
+		got := IsEmptyS(c.in)
+		if got != c.want {
+			t.Errorf("IsEmptyS(%q) == %v, want %v", c.in, got, c.want)
+		}
+	}
+}
