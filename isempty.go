@@ -1,7 +1,6 @@
 package strutil
 
 import (
-	"strings"
 	"unicode"
 )
 
@@ -19,7 +18,7 @@ func IsSpaceOrEmpty(s string) bool {
 
 // check that string is empty or space.
 func IsEmptyS(s string) bool {
-	return (len(strings.TrimSpace(s)) == 0)
+	return IsEmpty(s) || IsSpace(s)
 }
 
 func IsNotEmpty(s string) bool {
