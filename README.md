@@ -4,4 +4,4 @@ src/
         isempty.go
         isempty_test.go
 ```
-https://godoc.org/github.com/xiote/stringutil
+goDoc: https://godoc.org/github.com/xiote/stringutil
