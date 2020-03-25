@@ -7,8 +7,17 @@ import (
 	"net/http"
 )
 
-func Get(url string) string {
-	resp, err := http.Get(url)
+// HTTPClient interface
+type HTTPClient interface {
+	Get(url string) (resp *http.Response, err error)
+}
+
+func NewHttpClient() HTTPClient {
+	return &http.Client{}
+}
+
+func Get(url string, client HTTPClient) string {
+	resp, err := client.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
