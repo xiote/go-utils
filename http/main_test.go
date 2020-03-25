@@ -20,12 +20,17 @@ func TestGet(t *testing.T) {
 		in   string
 		want string
 	}{
-		{"http://anywhere", `{"fields":[],"records":[]}`},
+		{"http://abc", `{"fields":[],"records":[]}`},
 	}
 
 	for _, c := range cases {
 		GetMock = func(url string) (resp *http.Response, err error) {
-			json := `{"fields":[],"records":[]}`
+			json := ""
+			if url == "http://abc" {
+				json = `{"fields":[],"records":[]}`
+			} else {
+				json = ``
+			}
 			r := ioutil.NopCloser(bytes.NewReader([]byte(json)))
 			return &http.Response{
 				StatusCode: 200,
