@@ -2,20 +2,22 @@ package http
 
 import (
 	"bytes"
+	"github.com/stretchr/testify/mock"
+	"github.com/xiote/go-utils/http/mocks"
 	"io/ioutil"
 	"net/http"
 	"testing"
 )
 
-var GetMock func(url string) (resp *http.Response, err error)
-
-type MockHttpClient struct{}
-
-func (m MockHttpClient) Get(url string) (resp *http.Response, err error) {
-	return GetMock(url)
-}
-
 func TestGet(t *testing.T) {
+	mockHTTPClient := &mocks.HTTPClient{}
+	r := ioutil.NopCloser(bytes.NewReader([]byte(`{"fields":[],"records":[]}`)))
+	httpResponse := &http.Response{
+		StatusCode: 200,
+		Body:       r,
+	}
+	mockHTTPClient.On("Get", mock.Anything).Return(httpResponse, nil).Once()
+
 	cases := []struct {
 		in   string
 		want string
@@ -24,22 +26,13 @@ func TestGet(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		GetMock = func(url string) (resp *http.Response, err error) {
-			json := ""
-			if url == "http://abc" {
-				json = `{"fields":[],"records":[]}`
-			} else {
-				json = ``
-			}
-			r := ioutil.NopCloser(bytes.NewReader([]byte(json)))
-			return &http.Response{
-				StatusCode: 200,
-				Body:       r,
-			}, nil
-		}
-		got := Get(c.in, MockHttpClient{})
+
+		got := Get(c.in, mockHTTPClient)
+
 		if got != c.want {
 			t.Errorf("Get(%q) == %q, want %q", c.in, got, c.want)
 		}
+
+		mockHTTPClient.AssertExpectations(t)
 	}
 }
