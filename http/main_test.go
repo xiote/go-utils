@@ -2,7 +2,7 @@ package http
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/mock"
+	//"github.com/stretchr/testify/mock"
 	"github.com/xiote/go-utils/http/mocks"
 	"io/ioutil"
 	"net/http"
@@ -16,7 +16,7 @@ func TestGet(t *testing.T) {
 		StatusCode: 200,
 		Body:       r,
 	}
-	mockHTTPClient.On("Get", mock.Anything).Return(httpResponse, nil).Once()
+	mockHTTPClient.On("Get", "http://abc").Return(httpResponse, nil).Once()
 
 	cases := []struct {
 		in   string
