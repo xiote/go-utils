@@ -81,7 +81,7 @@ type KafkaConsumer interface {
 }
 type Consumer struct {
 	KafkaConsumer
-	MessageHandler func(string)
+	MessageHandler func(string) bool
 	Topics         []string
 }
 
@@ -115,7 +115,7 @@ func (c *Consumer) Consume() {
 				if e.Headers != nil {
 					fmt.Printf("%% Headers: %v\n", e.Headers)
 				}
-				c.MessageHandler(string(e.Value))
+				run = c.MessageHandler(string(e.Value))
 			case kafka.Error:
 				// Errors should generally be considered
 				// informational, the client will try to

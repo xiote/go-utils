@@ -1,9 +1,9 @@
 package kafka
 
 import (
-	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	//"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/mock"
 	"github.com/xiote/go-utils/kafka/mocks"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"testing"
 )
 
@@ -32,43 +32,25 @@ func TestProduce(t *testing.T) {
 		kafkaProducerMock.AssertExpectations(t)
 	}
 }
+func TestConsumer(t *testing.T) {
+	wantMessage := "TestMessage"
+	kafkaConsumerMock := &mocks.KafkaConsumer{}
+	topic := "test"
+	kafkaConsumerMock.On("SubscribeTopics", []string{"test"}, mock.AnythingOfType("kafka.RebalanceCb")).Return(nil).Once()
+	kafkaConsumerMock.On("Poll", 100).Return(&kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Value: []byte(wantMessage)}).Once()
+	kafkaConsumerMock.On("Close").Return(nil).Once()
 
-//type TopicPartition struct {
-//	Topic     *string
-//	Partition int32
-//	Offset    Offset
-//	Metadata  *string
-//	Error     error
-//}
+	c := Consumer{
+		kafkaConsumerMock, func(message string) bool {
+			if message == wantMessage {
+				// Test End
+				return false
+			} else {
+				t.Errorf("ConsumedMessage() == %q, want %q", message, wantMessage)
+				return true
+			}
+		}, []string{"test"}}
+	c.Consume()
 
-//func (p *Producer) Produce(message string) {
-//
-//	doneChan := make(chan bool)
-//
-//	go func() {
-//		defer close(doneChan)
-//		for e := range p.Events() {
-//			switch ev := e.(type) {
-//			case *kafka.Message:
-//				m := ev
-//				if m.TopicPartition.Error != nil {
-//					fmt.Printf("Delivery failed: %v\n", m.TopicPartition.Error)
-//				} else {
-//					fmt.Printf("Delivered message to topic %s [%d] at offset %v\n",
-//						*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset)
-//				}
-//				return
-//
-//			default:
-//				fmt.Printf("Ignored event: %s\n", ev)
-//			}
-//		}
-//	}()
-//
-//	p.KafkaProducer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.Topic, Partition: kafka.PartitionAny}, Value: []byte(message)}
-//
-//	// wait for delivery report goroutine to finish
-//	_ = <-doneChan
-//
-//	p.Close()
-//}
+	kafkaConsumerMock.AssertExpectations(t)
+}
