@@ -12,8 +12,12 @@ type HTTPClient interface {
 	Get(url string) (resp *http.Response, err error)
 }
 
-func Get(url string, client HTTPClient) string {
-	resp, err := client.Get(url)
+type Client struct {
+	HTTPClient HTTPClient
+}
+
+func (c *Client) Get(url string) string {
+	resp, err := c.HTTPClient.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}

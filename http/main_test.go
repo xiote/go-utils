@@ -25,9 +25,11 @@ func TestGet(t *testing.T) {
 		{"http://abc", `{"fields":[],"records":[]}`},
 	}
 
+	client := Client{mockHTTPClient}
+
 	for _, c := range cases {
 
-		got := Get(c.in, mockHTTPClient)
+		got := client.Get(c.in)
 
 		if got != c.want {
 			t.Errorf("Get(%q) == %q, want %q", c.in, got, c.want)
