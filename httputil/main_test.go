@@ -1,9 +1,9 @@
-package http
+package httputil
 
 import (
 	"bytes"
 	//"github.com/stretchr/testify/mock"
-	"github.com/xiote/go-utils/http/mocks"
+	"github.com/xiote/go-utils/httputil/mocks"
 	"io/ioutil"
 	"net/http"
 	"testing"
