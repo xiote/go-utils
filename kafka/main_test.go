@@ -1,60 +1,74 @@
 package kafka
 
 import (
-	"log"
-	"testing"
-
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	//"github.com/stretchr/testify/mock"
+	"github.com/xiote/go-utils/kafka/mocks"
+	"testing"
 )
 
 func TestProduce(t *testing.T) {
+	kafkaProducerMock := &mocks.KafkaProducer{}
+	messageChan := make(chan *kafka.Message, 1)
+	eventChan := make(chan kafka.Event, 1)
+	go func() {
+		message := <-messageChan
+		eventChan <- message
+	}()
+	kafkaProducerMock.On("Events").Return(eventChan).Once()
+	kafkaProducerMock.On("ProduceChannel").Return(messageChan).Once()
+	kafkaProducerMock.On("Close").Once()
+
 	cases := []struct {
-		in1 string
-		in2 string
-		in3 func() kafka.Producer
+		in string
 	}{
-		{"testMessage", "test", NewProducer},
+		{"TestMessage"},
 	}
 
 	for _, c := range cases {
-		Produce(c.in1, c.in2, c.in3)
+		p := Producer{kafkaProducerMock, "test"}
+		p.Produce(c.in)
+
+		kafkaProducerMock.AssertExpectations(t)
 	}
 }
 
-func NewProducer() kafka.Producer {
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost:9092"})
-	if err != nil {
-		panic(err)
-	}
-	return *p
-}
+//type TopicPartition struct {
+//	Topic     *string
+//	Partition int32
+//	Offset    Offset
+//	Metadata  *string
+//	Error     error
+//}
 
-func TestConsume(t *testing.T) {
-	cases := []struct {
-		in1 func(string)
-		in2 string
-		in3 func() kafka.Consumer
-	}{
-		{Process, "test", NewConsumer},
-	}
-
-	for _, c := range cases {
-		Consume(c.in1, c.in2, c.in3)
-	}
-}
-
-func NewConsumer() kafka.Consumer {
-	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092",
-		"group.id":          "group3",
-	})
-
-	if err != nil {
-		panic(err)
-	}
-	return *c
-}
-
-func Process(jsonString string) {
-	log.Println(jsonString)
-}
+//func (p *Producer) Produce(message string) {
+//
+//	doneChan := make(chan bool)
+//
+//	go func() {
+//		defer close(doneChan)
+//		for e := range p.Events() {
+//			switch ev := e.(type) {
+//			case *kafka.Message:
+//				m := ev
+//				if m.TopicPartition.Error != nil {
+//					fmt.Printf("Delivery failed: %v\n", m.TopicPartition.Error)
+//				} else {
+//					fmt.Printf("Delivered message to topic %s [%d] at offset %v\n",
+//						*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset)
+//				}
+//				return
+//
+//			default:
+//				fmt.Printf("Ignored event: %s\n", ev)
+//			}
+//		}
+//	}()
+//
+//	p.KafkaProducer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.Topic, Partition: kafka.PartitionAny}, Value: []byte(message)}
+//
+//	// wait for delivery report goroutine to finish
+//	_ = <-doneChan
+//
+//	p.Close()
+//}

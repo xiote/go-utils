@@ -22,19 +22,29 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 )
 
-func Produce(message string, topic string, newProducerFunc func() kafka.Producer) {
+type KafkaProducer interface {
+	Events() chan kafka.Event
+	ProduceChannel() chan *kafka.Message
+	Close()
+}
 
-	p := newProducerFunc()
+type Producer struct {
+	KafkaProducer
+	Topic string
+}
 
+func (p *Producer) Produce(message string) {
+	//fmt.Println("Start producing")
 	doneChan := make(chan bool)
 
 	go func() {
 		defer close(doneChan)
+		//fmt.Println("Getting events")
 		for e := range p.Events() {
+			//fmt.Println("Fetching events")
 			switch ev := e.(type) {
 			case *kafka.Message:
 				m := ev
@@ -52,23 +62,35 @@ func Produce(message string, topic string, newProducerFunc func() kafka.Producer
 		}
 	}()
 
-	p.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Value: []byte(message)}
+	//fmt.Println("Messaging")
+	p.KafkaProducer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.Topic, Partition: kafka.PartitionAny}, Value: []byte(message)}
 
+	//fmt.Println("Waiting")
 	// wait for delivery report goroutine to finish
 	_ = <-doneChan
+	//fmt.Println("Closing")
 
 	p.Close()
+	//fmt.Println("Closed")
 }
 
-func Consume(processFunc func(string), commaSeperatedTopics string, newConsumerFunc func() kafka.Consumer) {
+type KafkaConsumer interface {
+	SubscribeTopics(topics []string, rebalanceCb kafka.RebalanceCb) (err error)
+	Poll(timeoutMs int) (event kafka.Event)
+	Close() (err error)
+}
+type Consumer struct {
+	KafkaConsumer
+	MessageHandler func(string)
+	Topics         []string
+}
 
-	topics := strings.Split(commaSeperatedTopics, ",")
+func (c *Consumer) Consume() {
+	topics := c.Topics
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
-	c := newConsumerFunc()
-
-	err := c.SubscribeTopics(topics, nil)
+	err := c.KafkaConsumer.SubscribeTopics(topics, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +103,7 @@ func Consume(processFunc func(string), commaSeperatedTopics string, newConsumerF
 			fmt.Printf("Caught signal %v: terminating\n", sig)
 			run = false
 		default:
-			ev := c.Poll(100)
+			ev := c.KafkaConsumer.Poll(100)
 			if ev == nil {
 				continue
 			}
@@ -93,7 +115,7 @@ func Consume(processFunc func(string), commaSeperatedTopics string, newConsumerF
 				if e.Headers != nil {
 					fmt.Printf("%% Headers: %v\n", e.Headers)
 				}
-				processFunc(string(e.Value))
+				c.MessageHandler(string(e.Value))
 			case kafka.Error:
 				// Errors should generally be considered
 				// informational, the client will try to
@@ -111,5 +133,5 @@ func Consume(processFunc func(string), commaSeperatedTopics string, newConsumerF
 	}
 
 	fmt.Printf("Closing consumer\n")
-	c.Close()
+	c.KafkaConsumer.Close()
 }
