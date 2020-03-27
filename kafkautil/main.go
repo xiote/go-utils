@@ -1,4 +1,4 @@
-package kafka
+package kafkautil
 
 /**
  * Copyright 2016 Confluent Inc.

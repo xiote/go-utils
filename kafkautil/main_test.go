@@ -1,8 +1,8 @@
-package kafka
+package kafkautil
 
 import (
 	"github.com/stretchr/testify/mock"
-	"github.com/xiote/go-utils/kafka/mocks"
+	"github.com/xiote/go-utils/kafkautil/mocks"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"testing"
 )
