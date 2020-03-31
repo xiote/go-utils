@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	confluent_kafka_go_v1kafka "gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	kafka "gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -19,15 +19,15 @@ func (_m *KafkaProducer) Close() {
 }
 
 // Events provides a mock function with given fields:
-func (_m *KafkaProducer) Events() chan confluent_kafka_go_v1kafka.Event {
+func (_m *KafkaProducer) Events() chan kafka.Event {
 	ret := _m.Called()
 
-	var r0 chan confluent_kafka_go_v1kafka.Event
-	if rf, ok := ret.Get(0).(func() chan confluent_kafka_go_v1kafka.Event); ok {
+	var r0 chan kafka.Event
+	if rf, ok := ret.Get(0).(func() chan kafka.Event); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(chan confluent_kafka_go_v1kafka.Event)
+			r0 = ret.Get(0).(chan kafka.Event)
 		}
 	}
 
@@ -35,15 +35,15 @@ func (_m *KafkaProducer) Events() chan confluent_kafka_go_v1kafka.Event {
 }
 
 // ProduceChannel provides a mock function with given fields:
-func (_m *KafkaProducer) ProduceChannel() chan *confluent_kafka_go_v1kafka.Message {
+func (_m *KafkaProducer) ProduceChannel() chan *kafka.Message {
 	ret := _m.Called()
 
-	var r0 chan *confluent_kafka_go_v1kafka.Message
-	if rf, ok := ret.Get(0).(func() chan *confluent_kafka_go_v1kafka.Message); ok {
+	var r0 chan *kafka.Message
+	if rf, ok := ret.Get(0).(func() chan *kafka.Message); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(chan *confluent_kafka_go_v1kafka.Message)
+			r0 = ret.Get(0).(chan *kafka.Message)
 		}
 	}
 
