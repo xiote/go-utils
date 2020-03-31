@@ -12,7 +12,7 @@ type KafkaProducer interface {
 }
 
 type Producer struct {
-	OutChan chan string
+	SendChan chan string
 	KafkaProducer
 	Topic      string
 	MessageKey string
@@ -23,7 +23,7 @@ func (p *Producer) Produce() {
 	fmt.Println("[Producer] Start producing")
 
 	fmt.Println("[Producer] Getting page")
-	outString := <-p.OutChan
+	outString := <-p.SendChan
 
 	doneChan := make(chan bool)
 

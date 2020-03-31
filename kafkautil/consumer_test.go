@@ -17,13 +17,13 @@ func TestConsume(t *testing.T) {
 	//kafkaConsumerMock.On("Close").Return(nil)
 
 	want := "abc"
-	TopicsChan := make(chan string)
+	ReceiveChan := make(chan string)
 	DoCommitChan := make(chan bool)
 
-	c := Consumer{kafkaConsumerMock, []string{"testTopic"}, TopicsChan, DoCommitChan}
+	c := Consumer{kafkaConsumerMock, []string{"testTopic"}, ReceiveChan, DoCommitChan}
 	go c.Consume()
 
-	got := <-TopicsChan
+	got := <-ReceiveChan
 	DoCommitChan <- true
 
 	if got != want {
