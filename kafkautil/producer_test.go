@@ -32,7 +32,7 @@ func TestProduce(t *testing.T) {
 			sendChan <- c.in
 		}()
 
-		p := Producer{sendChan, kafkaProducerMock, "testTopic", "MessageKey"}
+		p := Producer{sendChan, kafkaProducerMock, "testTopic"}
 		p.Produce()
 
 		kafkaProducerMock.AssertExpectations(t)

@@ -14,8 +14,7 @@ type KafkaProducer interface {
 type Producer struct {
 	SendChan chan string
 	KafkaProducer
-	Topic      string
-	MessageKey string
+	Topic string
 }
 
 func (p *Producer) Produce() {
@@ -50,7 +49,7 @@ func (p *Producer) Produce() {
 	}()
 
 	fmt.Println("[Producer] Messaging")
-	p.KafkaProducer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.Topic, Partition: kafka.PartitionAny}, Value: []byte(outString), Key: []byte(p.MessageKey)}
+	p.KafkaProducer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.Topic, Partition: kafka.PartitionAny}, Value: []byte(outString)}
 
 	fmt.Println("[Producer] Waiting")
 	// wait for delivery report goroutine to finish
