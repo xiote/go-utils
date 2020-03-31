@@ -24,15 +24,15 @@ func TestProduce(t *testing.T) {
 		{"http://abc"},
 	}
 
-	pageChan := make(chan string)
+	sendChan := make(chan string)
 
 	for _, c := range cases {
 
 		go func() {
-			pageChan <- c.in
+			sendChan <- c.in
 		}()
 
-		p := Producer{pageChan, kafkaProducerMock, "testTopic", "MessageKey"}
+		p := Producer{sendChan, kafkaProducerMock, "testTopic", "MessageKey"}
 		p.Produce()
 
 		kafkaProducerMock.AssertExpectations(t)
