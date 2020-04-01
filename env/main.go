@@ -6,10 +6,10 @@ import (
 )
 
 func Getenv(name string) string {
-        value := os.Getenv(string)
-        if value == nil {
-                fmt.Errorf("ENV[%s] is nil!", name)                                                                                                       
-        }
+	value := os.Getenv(name)
+	if value == nil {
+		fmt.Errorf("ENV[%s] is nil!", name)
+	}
 }
 
 func S(name string) string {
