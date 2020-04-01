@@ -21,7 +21,7 @@ func (p *Producer) Produce() {
 
 	fmt.Println("[Producer] Start producing")
 
-	fmt.Println("[Producer] Getting page")
+	fmt.Println("[Producer] Getting data to send")
 	outString := <-p.SendChan
 
 	doneChan := make(chan bool)
