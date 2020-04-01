@@ -29,6 +29,7 @@ func (c *Consumer) Consume() {
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
 	err := c.KafkaConsumer.SubscribeTopics(topics, nil)
+	fmt.Printf("[Consumer] SubscribeTopics(%v)\n", topics)
 	if err != nil {
 		log.Fatal(err)
 	}
