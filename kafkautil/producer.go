@@ -28,7 +28,7 @@ func (p *Producer) Produce() {
 
 	go func() {
 		defer close(doneChan)
-		fmt.Println("[Producer] Getting events")
+		fmt.Printf("[Producer] [%s] Getting events\n", p.Topic)
 		for e := range p.Events() {
 			fmt.Println("[Producer] Fetching events")
 			switch ev := e.(type) {
