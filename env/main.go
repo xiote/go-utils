@@ -1,15 +1,17 @@
 package env
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 )
 
-func Getenv(name string) string {
-	value := os.Getenv(name)
-	if value == nil {
-		fmt.Errorf("ENV[%s] is nil!", name)
+func Getenv(key string) string {
+	val, ok := os.LookupEnv(key)
+	if !ok {
+		panic(fmt.Errorf("ENV[%s] is nil!", key))
 	}
+	return val
 }
 
 func S(name string) string {
