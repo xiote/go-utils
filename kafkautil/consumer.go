@@ -18,10 +18,9 @@ type KafkaConsumer interface {
 
 type Consumer struct {
 	KafkaConsumer
-	Topics           []string
-	ReceiveKeyChan   chan string
-	ReceiveValueChan chan string
-	DoCommitChan     chan bool
+	Topics       []string
+	ReceiveChan  chan string
+	DoCommitChan chan bool
 }
 
 func (c *Consumer) Consume() {
@@ -55,8 +54,7 @@ func (c *Consumer) Consume() {
 				if e.Headers != nil {
 					fmt.Printf("[Consumer] %% Headers: %v\n", e.Headers)
 				}
-				c.ReceiveKeyChan <- string(e.Key)
-				c.ReceiveValueChan <- string(e.Value)
+				c.ReceiveChan <- string(e.Value)
 				<-c.DoCommitChan // wait until done
 				fmt.Printf("[Consumer] Committing...\n")
 				c.CommitMessage(e) // commit
