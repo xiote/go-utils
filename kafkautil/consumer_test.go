@@ -8,26 +8,33 @@ import (
 )
 
 func TestConsume(t *testing.T) {
-	message := `abc`
+	key := `message`
+	value := `abc`
 	kafkaConsumerMock := &mocks.KafkaConsumer{}
 	topic := "testTopic"
 	kafkaConsumerMock.On("SubscribeTopics", []string{topic}, mock.AnythingOfType("kafka.RebalanceCb")).Return(nil)
-	kafkaConsumerMock.On("Poll", 100).Return(&kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Value: []byte(message)})
+	kafkaConsumerMock.On("Poll", 100).Return(&kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Key: []byte(key), Value: []byte(value)})
 	kafkaConsumerMock.On("CommitMessage", mock.Anything).Return(nil, nil)
 	//kafkaConsumerMock.On("Close").Return(nil)
 
-	want := "abc"
-	ReceiveChan := make(chan string)
+	wantKey := "message"
+	wantValue := "abc"
+	ReceiveKeyChan := make(chan string)
+	ReceiveValueChan := make(chan string)
 	DoCommitChan := make(chan bool)
 
-	c := Consumer{kafkaConsumerMock, []string{"testTopic"}, ReceiveChan, DoCommitChan}
+	c := Consumer{kafkaConsumerMock, []string{"testTopic"}, ReceiveKeyChan, ReceiveValueChan, DoCommitChan}
 	go c.Consume()
 
-	got := <-ReceiveChan
+	gotKey := <-ReceiveKeyChan
+	gotValue := <-ReceiveValueChan
 	DoCommitChan <- true
 
-	if got != want {
-		t.Errorf("Consume() == %q, want %q", got, want)
+	if gotKey != wantKey {
+		t.Errorf("ConsumeKey() == %q, want %q", gotKey, wantKey)
+	}
+	if gotValue != wantValue {
+		t.Errorf("ConsumeValue() == %q, want %q", gotValue, wantValue)
 	}
 	//kafkaConsumerMock.AssertExpectations(t)
 }
