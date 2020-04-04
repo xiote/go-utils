@@ -19,20 +19,23 @@ func TestProduce(t *testing.T) {
 	//kafkaProducerMock.On("Close").Once()
 
 	cases := []struct {
-		in string
+		in1 string
+		in2 string
 	}{
-		{"http://abc"},
+		{"url", "http://abc"},
 	}
 
-	sendChan := make(chan string)
+	sendKeyChan := make(chan string)
+	sendValueChan := make(chan string)
 
 	for _, c := range cases {
 
 		go func() {
-			sendChan <- c.in
+			sendKeyChan <- c.in1
+			sendValueChan <- c.in2
 		}()
 
-		p := Producer{sendChan, kafkaProducerMock, "testTopic"}
+		p := Producer{sendKeyChan, sendValueChan, kafkaProducerMock, "testTopic"}
 		p.Produce()
 
 		kafkaProducerMock.AssertExpectations(t)
