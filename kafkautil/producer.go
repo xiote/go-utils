@@ -18,12 +18,23 @@ type Producer struct {
 	Topic string
 }
 
+func NewProducer(sendChan chan string, kafkaProducer KafkaProducer, topic string) Producer {
+	return Producer{nil, sendChan, kafkaProducer, topic}
+}
+
+func NewProducer2(sendKeyChan chan string, sendValueChan chan string, kafkaProducer KafkaProducer, topic string) Producer {
+	return Producer{sendKeyChan, sendValueChan, kafkaProducer, topic}
+}
+
 func (p *Producer) Produce() {
 
 	fmt.Println("[Producer] Start producing")
 
 	fmt.Println("[Producer] Getting data to send")
-	outKey := <-p.SendKeyChan
+	var outKey string
+	if p.SendKeyChan != nil {
+		outKey = <-p.SendKeyChan
+	}
 	outValue := <-p.SendValueChan
 
 	doneChan := make(chan bool)
@@ -51,7 +62,11 @@ func (p *Producer) Produce() {
 	}()
 
 	fmt.Println("[Producer] Messaging")
-	p.KafkaProducer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.Topic, Partition: kafka.PartitionAny}, Key: []byte(outKey), Value: []byte(outValue)}
+	if outKey == "" {
+		p.KafkaProducer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.Topic, Partition: kafka.PartitionAny}, Value: []byte(outValue)}
+	} else {
+		p.KafkaProducer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.Topic, Partition: kafka.PartitionAny}, Key: []byte(outKey), Value: []byte(outValue)}
+	}
 
 	fmt.Println("[Producer] Waiting")
 	// wait for delivery report goroutine to finish
