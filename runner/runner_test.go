@@ -6,11 +6,11 @@ import (
 
 type YourT1 struct{}
 
-func (y YourT1) Concat(input1 string, input2 string) (string, error) {
+func (y *YourT1) Concat(input1 string, input2 string) (string, error) {
 	return input1 + input2, nil
 }
 
-func (y YourT1) Get(input1 string) error {
+func (y *YourT1) Get(input1 string) error {
 	return nil
 }
 
@@ -20,7 +20,7 @@ func TestCall(t *testing.T) {
 	inString2 := "B"
 	want := "AB"
 
-	r := NewRunner(YourT1{})
+	r := NewRunner(&YourT1{})
 	result, _ := r.Call(inMethodName, []string{inString1, inString2})
 
 	if result != want {
@@ -29,12 +29,11 @@ func TestCall(t *testing.T) {
 }
 
 func TestCall2(t *testing.T) {
-	inMethodName := "Get"
 
-	r := NewRunner(YourT1{})
+	r := NewRunner(&YourT1{})
 	result, _ := r.Call("Get", []string{"http://play.golang.org/?simple=1"})
 
 	if result != "" {
-		t.Errorf("Call(%q) == %v, want %v", inMethodName, result, "")
+		t.Errorf("Call(%q) == %v, want %v", "Get", result, "")
 	}
 }

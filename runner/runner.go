@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"fmt"
 	"reflect"
 )
 
@@ -9,7 +10,7 @@ func NewRunner(any interface{}) Runner {
 }
 
 type Runner struct {
-	Any interface{}
+	Any interface{} // pointer
 }
 
 func (r *Runner) Call(methodName string, args []string) (string, error) {
@@ -18,7 +19,9 @@ func (r *Runner) Call(methodName string, args []string) (string, error) {
 	for i, _ := range args {
 		inputs[i] = reflect.ValueOf(args[i])
 	}
-	result := reflect.ValueOf(r.Any).MethodByName(methodName).Call(inputs)
+	f := reflect.ValueOf(r.Any).MethodByName(methodName)
+	fmt.Printf("%v", f)
+	result := f.Call(inputs)
 	if len(result) == 1 {
 		err := result[0].Interface()
 		if err == nil {
