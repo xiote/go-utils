@@ -6,8 +6,8 @@ import (
 
 type YourT1 struct{}
 
-func (y YourT1) Concat(input1 string, input2 string) (error, string) {
-	return nil, input1 + input2
+func (y YourT1) Concat(input1 string, input2 string) (string, error) {
+	return input1 + input2, nil
 }
 
 func TestCall(t *testing.T) {
@@ -17,9 +17,9 @@ func TestCall(t *testing.T) {
 	want := "AB"
 
 	r := NewRunner(YourT1{})
-	_, result := r.Call(inMethodName, []string{inString1, inString2})
+	result, _ := r.Call(inMethodName, []string{inString1, inString2})
 
 	if result != want {
-		t.Errorf("Call(%q) == %v, want %v", inMethodName, result[1], want)
+		t.Errorf("Call(%q) == %v, want %v", inMethodName, result, want)
 	}
 }
