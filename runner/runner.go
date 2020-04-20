@@ -12,19 +12,18 @@ type Runner struct {
 	Any interface{}
 }
 
-func (r *Runner) Call(methodName string, args []string) []reflect.Value {
+func (r *Runner) Call(methodName string, args []string) (error, string) {
 
 	inputs := make([]reflect.Value, len(args))
 	for i, _ := range args {
 		inputs[i] = reflect.ValueOf(args[i])
 	}
 	result := reflect.ValueOf(r.Any).MethodByName(methodName).Call(inputs)
-	return result
+	err := result[0].Interface()
+	if err == nil {
+		return nil, result[1].Interface().(string)
+	} else {
+		return result[0].Interface().(error), result[1].Interface().(string)
+	}
 
-	//err := result[0].Interface()
-	//if err == nil {
-	//    fmt.Println("No error returned by", m)
-	//} else {
-	//    fmt.Printf("Error calling %s: %v", m, err)
-	//}
 }

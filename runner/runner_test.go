@@ -17,9 +17,9 @@ func TestCall(t *testing.T) {
 	want := "AB"
 
 	r := NewRunner(YourT1{})
-	result := r.Call(inMethodName, []string{inString1, inString2})
+	_, result := r.Call(inMethodName, []string{inString1, inString2})
 
-	if result[1].Interface() != want {
+	if result != want {
 		t.Errorf("Call(%q) == %v, want %v", inMethodName, result[1], want)
 	}
 }
