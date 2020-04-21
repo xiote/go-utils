@@ -37,3 +37,13 @@ func TestCall2(t *testing.T) {
 		t.Errorf("Call(%q) == %v, want %v", "Get", result, "")
 	}
 }
+
+func TestCall3(t *testing.T) {
+
+	r := NewRunner(&YourT1{})
+	result, _ := r.Call2("Get", "http://play.golang.org/?simple=1")
+
+	if result != "" {
+		t.Errorf("Call(%q) == %v, want %v", "Get", result, "")
+	}
+}
