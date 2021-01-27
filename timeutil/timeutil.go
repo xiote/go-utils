@@ -5,8 +5,8 @@ import (
 )
 
 type Clock struct {
-	settime   time.Time
-	starttime time.Time
+	SetTime   time.Time
+	StartTime time.Time
 	Slowness  time.Duration
 }
 
@@ -22,7 +22,7 @@ func (c *Clock) AlarmAt(alarmtime time.Time) <-chan time.Time {
 }
 
 func (c *Clock) Now() time.Time {
-	return c.settime.Add(time.Since(c.starttime))
+	return c.SetTime.Add(time.Since(c.StartTime))
 }
 
 func MustParseDuration(s string) time.Duration {
