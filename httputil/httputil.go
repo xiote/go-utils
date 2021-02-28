@@ -29,10 +29,9 @@ func DoOnEuckr(client *http.Client, req *http.Request) (src string, err error) {
 func Do(client *http.Client, req *http.Request, reqName string) (src string, err error) {
 
 	var starttime time.Time
-
 	go func() {
 		starttime = time.Now()
-		go log.Printf("[%s] [%s]\n", reqName, "Start")
+		go log.Printf("[%s] [START]\n", reqName)
 	}()
 
 	var body []byte
@@ -42,8 +41,8 @@ func Do(client *http.Client, req *http.Request, reqName string) (src string, err
 
 	go func() {
 		elasped := time.Since(starttime)
-		l := int64(len(body))
-		log.Printf("[%s] [%s] [%d] [%d] [ %d Bits/Sec ]\n", reqName, elasped, req.ContentLength, l, l*8*1000*1000*1000/elasped.Nanoseconds())
+		l := int64(len(body) * 8)
+		log.Printf("[%s] [END] [%s] [%d] [ %d Mbps ]\n", reqName, elasped, l, l*1000/elasped.Nanoseconds())
 	}()
 
 	src = string(body)
