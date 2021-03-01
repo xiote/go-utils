@@ -12,11 +12,26 @@ import (
 	"time"
 )
 
-func DoOnEuckr(client *http.Client, req *http.Request) (src string, err error) {
+func EuckrDo(client *http.Client, req *http.Request, nameforlog string) (src string, err error) {
+	var starttime time.Time
 	var body []byte
+	var elaspedHttpDuration time.Duration
+	go func() {
+		starttime = time.Now()
+		go log.Printf("[%s] [START]\n", nameforlog)
+	}()
+	defer func() {
+		go func() {
+			l := int64(len(body) * 8)
+			log.Printf("[%s] [END] [ %s ] [ %s ] [ %d Bits ] [ %d Kbps ]\n", nameforlog, time.Since(starttime), elaspedHttpDuration, l, l*1000000/elaspedHttpDuration.Nanoseconds())
+		}()
+	}()
+
 	if body, err = do(client, req); err != nil {
 		return
 	}
+	go func() { elaspedHttpDuration = time.Since(starttime) }()
+
 	var bufs bytes.Buffer
 	wr := tf.NewWriter(&bufs, korean.EUCKR.NewDecoder())
 	defer wr.Close()
@@ -26,24 +41,35 @@ func DoOnEuckr(client *http.Client, req *http.Request) (src string, err error) {
 	return
 }
 
-func Do(client *http.Client, req *http.Request, reqName string) (src string, err error) {
-
-	var starttime time.Time
-	go func() {
-		starttime = time.Now()
-		go log.Printf("[%s] [START]\n", reqName)
-	}()
-
+func DoWithoutLog(client *http.Client, req *http.Request) (src string, err error) {
 	var body []byte
 	if body, err = do(client, req); err != nil {
 		return
 	}
+	src = string(body)
+	return
+}
 
+func Do(client *http.Client, req *http.Request, nameforlog string) (src string, err error) {
+	var starttime time.Time
+	var body []byte
+	var elaspedHttpDuration time.Duration
 	go func() {
-		elasped := time.Since(starttime)
-		l := int64(len(body) * 8)
-		log.Printf("[%s] [END] [%s] [%d] [ %d Mbps ]\n", reqName, elasped, l, l*1000/elasped.Nanoseconds())
+		starttime = time.Now()
+		go log.Printf("[%s] [START]\n", nameforlog)
 	}()
+	defer func() {
+		go func() {
+			l := int64(len(body) * 8)
+			elaspedHttpDuration = time.Since(starttime)
+			log.Printf("[%s] [END] [ %s ] [ %s ] [ %d Bits ] [ %d Kbps ]\n", nameforlog, time.Since(starttime), elaspedHttpDuration, l, l*1000000/elaspedHttpDuration.Nanoseconds())
+		}()
+	}()
+
+	if body, err = do(client, req); err != nil {
+		return
+	}
+	// go func() { elaspedHttpDuration = time.Since(starttime) }()
 
 	src = string(body)
 	return

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func Test_Httputil_Do(t *testing.T) {
+func Test_Httputil_DoOrg(t *testing.T) {
 
 	var req *http.Request
 	var err error
@@ -33,12 +33,12 @@ func Test_Httputil_Do(t *testing.T) {
 	assert.NoError(t, err, "err")
 	assert.NotEmpty(t, src, "src")
 
-	fmt.Println(src)
-	<-time.After(time.Second * 10)
+	// fmt.Println(src)
+	<-time.After(time.Second * 1)
 
 }
 
-func Test_Httputil_Doloop(t *testing.T) {
+func Test_Httputil_DoLoop(t *testing.T) {
 
 	var req *http.Request
 	var err error
