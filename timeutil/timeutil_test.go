@@ -37,3 +37,15 @@ func Test_Clock_AlarmAt(t *testing.T) {
 	assert.NotEmpty(t, attime, "attime")
 	fmt.Println(attime)
 }
+
+func Test_Time_MustParseTime(t *testing.T) {
+
+	var theTime time.Time
+
+	theTime, _ = time.Parse("15시 04분", "14시 00분")
+	assert.Equal(t, theTime, MustParseTime("오후2시"))
+	assert.Equal(t, theTime, MustParseTime("오후2시 00분"))
+	assert.Equal(t, theTime, MustParseTime("14시 00분 "))
+	assert.Equal(t, theTime, MustParseTime("14시 00분"))
+	assert.Equal(t, theTime, MustParseTime("14시"))
+}

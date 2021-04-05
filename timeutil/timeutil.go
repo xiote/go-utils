@@ -1,6 +1,7 @@
 package timeutil
 
 import (
+	"strings"
 	"time"
 )
 
@@ -32,4 +33,27 @@ func MustParseDuration(s string) time.Duration {
 		return d
 	}
 
+}
+
+func MustParseTime(s string) time.Time {
+	s = strings.ReplaceAll(s, " ", "")
+	if strings.HasSuffix(s, "시") {
+		s = s + "00분"
+	}
+
+	if strings.HasPrefix(s, "오전") || strings.HasPrefix(s, "오후") {
+		s = strings.ReplaceAll(s, "오전", "AM")
+		s = strings.ReplaceAll(s, "오후", "PM")
+		if t, err := time.Parse("PM3시04분", s); err != nil {
+			panic(err)
+		} else {
+			return t
+		}
+	} else {
+		if t, err := time.Parse("15시04분", s); err != nil {
+			panic(err)
+		} else {
+			return t
+		}
+	}
 }
